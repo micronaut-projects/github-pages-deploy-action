@@ -88,5 +88,5 @@ cp -r "$FOLDER/." "./$VERSION/"
 git add "$VERSION/*"
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
-git push origin HEAD || true && \
+git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" gh-pages || true && \
 echo "Deployment succesful!"
