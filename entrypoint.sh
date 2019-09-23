@@ -25,6 +25,11 @@ then
   VERSION="snapshot"
 fi
 
+if [ -z "$BETA" ]
+then
+  BETA="false"
+fi
+
 case "$FOLDER" in /*|./*)
   echo "The deployment folder cannot be prefixed with '/' or './'. Instead reference the folder name directly."
   exit 1
@@ -86,6 +91,19 @@ echo "Deploying to GitHub..." && \
 git checkout $BRANCH
 cp -r "$FOLDER/." "./$VERSION/"
 git add "$VERSION/*"
+
+if [[ $VERSION != 'snapshot' && BETA == 'false' ]]; then
+    mkdir -p latest
+    cp -r "$FOLDER/." ./latest/
+    git add latest/*
+
+    majorVersion=${VERSION:0:4}
+    majorVersion="${majorVersion}x"
+
+    mkdir -p "$majorVersion"
+    cp -r ."$FOLDER/." "./$majorVersion/"
+    git add "$majorVersion/*"
+fi
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
 git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" gh-pages || true && \
