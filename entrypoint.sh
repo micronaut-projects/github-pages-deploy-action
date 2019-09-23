@@ -92,8 +92,7 @@ git checkout $BRANCH
 cp -r "$FOLDER/." "./$VERSION/"
 git add "$VERSION/*"
 
-if [ $VERSION != 'snapshot' && BETA == 'false' ]; 
-then
+if [[ $VERSION != 'snapshot' && $BETA == 'false' ]]; then
     mkdir -p latest
     cp -r "$FOLDER/." ./latest/
     git add latest/*
