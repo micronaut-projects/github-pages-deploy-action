@@ -20,11 +20,6 @@ then
   exit 1
 fi
 
-if [ -z "$VERSION" ]
-then
-  VERSION="snapshot"
-fi
-
 if [ -z "$BETA" ]
 then
   BETA="false"
