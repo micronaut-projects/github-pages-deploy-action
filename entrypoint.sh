@@ -81,11 +81,12 @@ if [ "$CNAME" ]; then
   echo $CNAME > $FOLDER/CNAME
 fi
 
+# Commits the data to Github.
+echo "Deploying to GitHub..." && \
+git checkout $BRANCH
+  
 if [ -z "$VERSION" ]
 then
-  # Commits the data to Github.
-  echo "Deploying to GitHub..." && \
-  git checkout $BRANCH
   mkdir -p snapshot
   cp -r "$FOLDER/." ./snapshot/
   git add snapshot/*
