@@ -86,13 +86,15 @@ if [ "$CNAME" ]; then
   echo $CNAME > $FOLDER/CNAME
 fi
 
-# Commits the data to Github.
-echo "Deploying to GitHub..." && \
-git checkout $BRANCH
-cp -r "$FOLDER/." "./$VERSION/"
-git add "$VERSION/*"
-
-if [[ $VERSION != 'snapshot' && $BETA == 'false' ]]; then
+if [ -z "$VERSION" ]
+then
+  # Commits the data to Github.
+  echo "Deploying to GitHub..." && \
+  git checkout $BRANCH
+  mkdir -p snapshot
+  cp -r "$FOLDER/." ./snapshot/
+  git add snapshot/*
+else 
     mkdir -p latest
     cp -r "$FOLDER/." ./latest/
     git add latest/*
@@ -104,6 +106,7 @@ if [[ $VERSION != 'snapshot' && $BETA == 'false' ]]; then
     cp -r ."$FOLDER/." "./$majorVersion/"
     git add "$majorVersion/*"
 fi
+
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
 git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" gh-pages || true && \
