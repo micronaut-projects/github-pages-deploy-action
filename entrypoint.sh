@@ -87,10 +87,12 @@ git checkout $BRANCH
   
 if [ -z "$VERSION" ]
 then
+  echo "No Version. Publishing Snapshot of Docs"
   mkdir -p snapshot
   cp -r "$FOLDER/." ./snapshot/
   git add snapshot/*
 else 
+    echo "Publishing $VERSION of Docs"
     mkdir -p latest
     cp -r "$FOLDER/." ./latest/
     git add latest/*
