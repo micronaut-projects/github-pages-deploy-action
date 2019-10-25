@@ -114,4 +114,5 @@ fi
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
 git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" gh-pages || true && \
+git checkout "${BASE_BRANCH:-master}" && \
 echo "Deployment succesful!"
