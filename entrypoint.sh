@@ -47,11 +47,11 @@ apt-get install -y git && \
 # Directs the action to the the Github workspace.
 cd $GITHUB_WORKSPACE && \
 
-echo "Workspace Info" && \
-echo "--------------" && \
-pwd && \
-ls -l && \
-echo "--------------" && \
+# echo "Workspace Info" && \
+# echo "--------------" && \
+# pwd && \
+# ls -l build && \
+# echo "--------------" && \
 
 # Configures Git.
 git init && \
@@ -107,7 +107,7 @@ else
     majorVersion="${majorVersion}x"
 
     mkdir -p "$majorVersion"
-    cp -r ."$FOLDER/." "./$majorVersion/"
+    cp -r "$FOLDER/." "./$majorVersion/"
     git add "$majorVersion/*"
 fi
 
