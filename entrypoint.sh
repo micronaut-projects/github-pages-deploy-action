@@ -20,11 +20,6 @@ then
   exit 1
 fi
 
-if [ -z "$BETA" ]
-then
-  BETA="false"
-fi
-
 case "$FOLDER" in /*|./*)
   echo "The deployment folder cannot be prefixed with '/' or './'. Instead reference the folder name directly."
   exit 1
@@ -99,9 +94,13 @@ then
   git add snapshot/*
 else 
     echo "Publishing $VERSION of Docs"
-    mkdir -p latest
-    cp -r "$FOLDER/." ./latest/
-    git add latest/*
+    if [ -z "$BETA" ]
+    then 
+      echo "Publishing Latest Docs"
+      mkdir -p latest
+      cp -r "$FOLDER/." ./latest/
+      git add latest/*
+    fi   
 
     majorVersion=${VERSION:0:4}
     majorVersion="${majorVersion}x"
