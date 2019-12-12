@@ -30,6 +30,11 @@ then
   COMMIT_EMAIL="${GITHUB_ACTOR}@users.noreply.github.com"
 fi
 
+if [ -z "$GH_REPOSITORY" ]
+then
+  GH_REPOSITORY="${GITHUB_REPOSITORY}"
+fi
+
 if [ -z "$COMMIT_NAME" ]
 then
   COMMIT_NAME="${GITHUB_ACTOR}"
@@ -54,7 +59,7 @@ git config --global user.email "${COMMIT_EMAIL}" && \
 git config --global user.name "${COMMIT_NAME}" && \
 
 ## Initializes the repository path using the access token.
-REPOSITORY_PATH="https://${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" && \
+REPOSITORY_PATH="https://${GH_TOKEN}@github.com/${GH_REPOSITORY}.git" && \
 
 # Checks to see if the remote exists prior to deploying.
 # If the branch doesn't exist it gets created here as an orphan.
@@ -112,6 +117,6 @@ fi
 
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
-git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" gh-pages || true && \
+git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GH_REPOSITORY.git" gh-pages || true && \
 git checkout "${BASE_BRANCH:-master}" && \
 echo "Deployment succesful!"
