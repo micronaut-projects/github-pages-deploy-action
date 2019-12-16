@@ -42,10 +42,6 @@ apt-get install -y git && \
 # Directs the action to the the Github workspace.
 cd $GITHUB_WORKSPACE && \
 
-echo "GIT CONFIG" && \
-
-cat .git/config && \
-git branch -a && \
 
 # Configures Git.
 git init && \
@@ -83,7 +79,8 @@ fi
 
 # Commits the data to Github.
 echo "Deploying to GitHub..." && \
-git checkout $BRANCH
+git fetch && \
+git checkout -b $BRANCH origin/$BRANCH  && \
   
 if [ -z "$VERSION" ]
 then
