@@ -41,19 +41,6 @@ apt-get install -y git && \
 
 # Directs the action to the the Github workspace.
 cd $GITHUB_WORKSPACE && \
-
-echo "Current Workshop" && \
-
-ls -l && \
-
-# echo "Workspace Info" && \
-# echo "--------------" && \
-# pwd && \
-# ls -l build && \
-# echo "--------------" && \
-
-# Configures Git.
-git init && \
 git config --global user.email "${COMMIT_EMAIL}" && \
 git config --global user.name "${COMMIT_NAME}" && \
 
