@@ -45,6 +45,7 @@ cd $GITHUB_WORKSPACE && \
 echo "GIT CONFIG" && \
 
 cat .git/config && \
+git branch -a && \
 
 # Configures Git.
 git init && \
