@@ -101,6 +101,10 @@ else
     majorVersion=${VERSION:0:4}
     majorVersion="${majorVersion}x"
 
+    mkdir -p "$VERSION"
+    cp -r "$FOLDER/." "./$VERSION/"
+    git add "$VERSION/*"
+    
     mkdir -p "$majorVersion"
     cp -r "$FOLDER/." "./$majorVersion/"
     git add "$majorVersion/*"
