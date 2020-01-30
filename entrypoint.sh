@@ -90,7 +90,7 @@ then
   git add snapshot/*
 else 
     echo "Publishing $VERSION of Docs"
-    if [ -z "$BETA" ]
+    if [ -z "$BETA" ] || [ "$BETA" = "false" ]
     then 
       echo "Publishing Latest Docs"
       mkdir -p latest
