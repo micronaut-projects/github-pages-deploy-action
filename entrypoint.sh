@@ -34,6 +34,10 @@ if [ -z "$COMMIT_NAME" ]
 then
   COMMIT_NAME="${GITHUB_ACTOR}"
 fi
+if [ -z "$TARGET_REPOSITORY" ]
+then
+  TARGET_REPOSITORY="${GITHUB_REPOSITORY}"
+fi
 
 # Installs Git.
 apt-get update && \
@@ -49,7 +53,11 @@ git config --global user.email "${COMMIT_EMAIL}" && \
 git config --global user.name "${COMMIT_NAME}" && \
 
 ## Initializes the repository path using the access token.
-REPOSITORY_PATH="https://${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" && \
+REPOSITORY_PATH="https://${GH_TOKEN}@github.com/${TARGET_REPOSITORY}.git" && \
+
+## Clone the target repository
+git clone "$REPOSITORY_PATH" docs && \
+cd docs \
 
 # Checks to see if the remote exists prior to deploying.
 # If the branch doesn't exist it gets created here as an orphan.
@@ -86,7 +94,7 @@ if [ -z "$VERSION" ]
 then
   echo "No Version. Publishing Snapshot of Docs"
   mkdir -p snapshot
-  cp -r "$FOLDER/." ./snapshot/
+  cp -r "../$FOLDER/." ./snapshot/
   git add snapshot/*
 else 
     echo "Publishing $VERSION of Docs"
@@ -94,7 +102,7 @@ else
     then 
       echo "Publishing Latest Docs"
       mkdir -p latest
-      cp -r "$FOLDER/." ./latest/
+      cp -r "../$FOLDER/." ./latest/
       git add latest/*
     fi   
 
@@ -102,16 +110,16 @@ else
     majorVersion="${majorVersion}x"
 
     mkdir -p "$VERSION"
-    cp -r "$FOLDER/." "./$VERSION/"
+    cp -r "../$FOLDER/." "./$VERSION/"
     git add "$VERSION/*"
     
     mkdir -p "$majorVersion"
-    cp -r "$FOLDER/." "./$majorVersion/"
+    cp -r "../$FOLDER/." "./$majorVersion/"
     git add "$majorVersion/*"
 fi
 
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
-git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" gh-pages || true && \
+git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$TARGET_REPOSITORY.git" gh-pages || true && \
 git checkout "${BASE_BRANCH:-master}" && \
 echo "Deployment succesful!"
