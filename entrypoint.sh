@@ -46,6 +46,8 @@ apt-get install -y git && \
 # Directs the action to the the Github workspace.
 cd $GITHUB_WORKSPACE && \
 
+# Base branch will be always the current branch
+BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
 
 # Configures Git.
 git init && \
@@ -64,7 +66,7 @@ cd docs \
 if [ "$(git ls-remote --heads "$REPOSITORY_PATH" "$BRANCH" | wc -l)" -eq 0 ];
 then
   echo "Creating remote branch ${BRANCH} as it doesn't exist..."
-  git checkout "${BASE_BRANCH:-master}" && \
+  git checkout "${BASE_BRANCH}" && \
   git checkout --orphan $BRANCH && \
   git rm -rf . && \
   touch README.md && \
@@ -74,7 +76,7 @@ then
 fi
 
 # Checks out the base branch to begin the deploy process.
-git checkout "${BASE_BRANCH:-master}" && \
+git checkout "${BASE_BRANCH}" && \
 
 # Builds the project if a build script is provided.
 echo "Running build scripts... $BUILD_SCRIPT" && \
@@ -121,5 +123,5 @@ fi
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
 git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$TARGET_REPOSITORY.git" gh-pages || true && \
-git checkout "${BASE_BRANCH:-master}" && \
+git checkout "${BASE_BRANCH}" && \
 echo "Deployment succesful!"
