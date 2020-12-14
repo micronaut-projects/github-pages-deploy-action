@@ -79,7 +79,7 @@ then
 else
   ## Clone the target repository
   git clone "$REPOSITORY_PATH" $DOC_FOLDER --branch $BRANCH --single-branch && \
-  cd $DOC_FOLDER \
+  cd $DOC_FOLDER
 fi
 
 # Checks out the base branch to begin the deploy process.
