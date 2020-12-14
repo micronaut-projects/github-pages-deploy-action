@@ -83,38 +83,63 @@ fi
 echo "Running build scripts... $BUILD_SCRIPT" && \
 eval "$BUILD_SCRIPT" && \
 
-if [ "$CNAME" ]; then
-  echo "Generating a CNAME file in in the $FOLDER directory..."
-  echo $CNAME > $FOLDER/CNAME
+if [ -n "$CNAME" ]; then
+  echo "Generating a CNAME file in in the $PWD directory..."
+  echo $CNAME > CNAME
+  git add CNAME
 fi
 
 # Commits the data to Github.
 if [ -z "$VERSION" ]
 then
   echo "No Version. Publishing Snapshot of Docs"
-  mkdir -p snapshot
-  cp -r "../$FOLDER/." ./snapshot/
-  git add snapshot/*
+  if [ -n "${DOC_SUB_FOLDER}" ]; then
+    mkdir -p snapshot/$DOC_SUB_FOLDER
+    cp -r "../$FOLDER/." ./snapshot/$DOC_SUB_FOLDER/
+    git add snapshot/$DOC_SUB_FOLDER/*
+  else
+    mkdir -p snapshot
+    cp -r "../$FOLDER/." ./snapshot/
+    git add snapshot/*
+  fi
 else 
     echo "Publishing $VERSION of Docs"
     if [ -z "$BETA" ] || [ "$BETA" = "false" ]
     then 
       echo "Publishing Latest Docs"
-      mkdir -p latest
-      cp -r "../$FOLDER/." ./latest/
-      git add latest/*
+      if [ -n "${DOC_SUB_FOLDER}" ]; then
+        mkdir -p latest/$DOC_SUB_FOLDER
+        cp -r "../$FOLDER/." ./latest/$DOC_SUB_FOLDER/
+        git add latest/$DOC_SUB_FOLDER/*
+      else
+        mkdir -p latest
+        cp -r "../$FOLDER/." ./latest/
+        git add latest/*
+      fi
     fi   
 
     majorVersion=${VERSION:0:4}
     majorVersion="${majorVersion}x"
 
-    mkdir -p "$VERSION"
-    cp -r "../$FOLDER/." "./$VERSION/"
-    git add "$VERSION/*"
-    
-    mkdir -p "$majorVersion"
-    cp -r "../$FOLDER/." "./$majorVersion/"
-    git add "$majorVersion/*"
+    if [ -n "${DOC_SUB_FOLDER}" ]; then
+      mkdir -p "$VERSION/$DOC_SUB_FOLDER"
+      cp -r "../$FOLDER/." "./$VERSION/$DOC_SUB_FOLDER"
+      git add "$VERSION/$DOC_SUB_FOLDER/*"
+    else
+      mkdir -p "$VERSION"
+      cp -r "../$FOLDER/." "./$VERSION/"
+      git add "$VERSION/*"
+    fi
+
+    if [ -n "${DOC_SUB_FOLDER}" ]; then
+      mkdir -p "$majorVersion/$DOC_SUB_FOLDER"
+      cp -r "../$FOLDER/." "./$majorVersion/$DOC_SUB_FOLDER"
+      git add "$majorVersion/$DOC_SUB_FOLDER/*"
+    else
+      mkdir -p "$majorVersion"
+      cp -r "../$FOLDER/." "./$majorVersion/"
+      git add "$majorVersion/*"
+    fi
 fi
 
 
