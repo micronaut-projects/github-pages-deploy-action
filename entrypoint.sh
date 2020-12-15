@@ -14,6 +14,11 @@ then
   exit 1
 fi
 
+if [ -z "$DOC_FOLDER" ];
+then
+  DOC_FOLDER=$BRANCH
+fi
+
 if [ -z "$FOLDER" ]
 then
   echo "You must provide the action with the folder name in the repository where your compiled page lives."
@@ -46,9 +51,6 @@ apt-get install -y git && \
 # Directs the action to the the Github workspace.
 cd $GITHUB_WORKSPACE && \
 
-# Base branch will be always the current branch
-BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
-
 # Configures Git.
 git init && \
 git config --global user.email "${COMMIT_EMAIL}" && \
@@ -57,70 +59,90 @@ git config --global user.name "${COMMIT_NAME}" && \
 ## Initializes the repository path using the access token.
 REPOSITORY_PATH="https://${GH_TOKEN}@github.com/${TARGET_REPOSITORY}.git" && \
 
-## Clone the target repository
-git clone "$REPOSITORY_PATH" docs && \
-cd docs \
-
 # Checks to see if the remote exists prior to deploying.
 # If the branch doesn't exist it gets created here as an orphan.
 if [ "$(git ls-remote --heads "$REPOSITORY_PATH" "$BRANCH" | wc -l)" -eq 0 ];
 then
   echo "Creating remote branch ${BRANCH} as it doesn't exist..."
-  git checkout "${BASE_BRANCH}" && \
-  git checkout --orphan $BRANCH && \
-  git rm -rf . && \
+  mkdir $DOC_FOLDER && \
+  cd $DOC_FOLDER && \
+  git init && \
+  git checkout -b $BRANCH && \
+  git remote add origin $REPOSITORY_PATH && \
   touch README.md && \
   git add README.md && \
   git commit -m "Initial ${BRANCH} commit" && \
   git push $REPOSITORY_PATH $BRANCH
+else
+  ## Clone the target repository
+  git clone "$REPOSITORY_PATH" $DOC_FOLDER --branch $BRANCH --single-branch && \
+  cd $DOC_FOLDER
 fi
-
-# Checks out the base branch to begin the deploy process.
-git checkout "${BASE_BRANCH}" && \
 
 # Builds the project if a build script is provided.
 echo "Running build scripts... $BUILD_SCRIPT" && \
 eval "$BUILD_SCRIPT" && \
 
-if [ "$CNAME" ]; then
-  echo "Generating a CNAME file in in the $FOLDER directory..."
-  echo $CNAME > $FOLDER/CNAME
+if [ -n "$CNAME" ]; then
+  echo "Generating a CNAME file in in the $PWD directory..."
+  echo $CNAME > CNAME
+  git add CNAME
 fi
 
 # Commits the data to Github.
-echo "Deploying to GitHub..." && \
-git fetch && \
-git checkout -b $BRANCH origin/$BRANCH  && \
-  
 if [ -z "$VERSION" ]
 then
   echo "No Version. Publishing Snapshot of Docs"
-  mkdir -p snapshot
-  cp -r "../$FOLDER/." ./snapshot/
-  git add snapshot/*
+  if [ -n "${DOC_SUB_FOLDER}" ]; then
+    mkdir -p snapshot/$DOC_SUB_FOLDER
+    cp -r "../$FOLDER/." ./snapshot/$DOC_SUB_FOLDER/
+    git add snapshot/$DOC_SUB_FOLDER/*
+  else
+    mkdir -p snapshot
+    cp -r "../$FOLDER/." ./snapshot/
+    git add snapshot/*
+  fi
 else 
     echo "Publishing $VERSION of Docs"
     if [ -z "$BETA" ] || [ "$BETA" = "false" ]
     then 
       echo "Publishing Latest Docs"
-      mkdir -p latest
-      cp -r "../$FOLDER/." ./latest/
-      git add latest/*
+      if [ -n "${DOC_SUB_FOLDER}" ]; then
+        mkdir -p latest/$DOC_SUB_FOLDER
+        cp -r "../$FOLDER/." ./latest/$DOC_SUB_FOLDER/
+        git add latest/$DOC_SUB_FOLDER/*
+      else
+        mkdir -p latest
+        cp -r "../$FOLDER/." ./latest/
+        git add latest/*
+      fi
     fi   
 
     majorVersion=${VERSION:0:4}
     majorVersion="${majorVersion}x"
 
-    mkdir -p "$VERSION"
-    cp -r "../$FOLDER/." "./$VERSION/"
-    git add "$VERSION/*"
-    
-    mkdir -p "$majorVersion"
-    cp -r "../$FOLDER/." "./$majorVersion/"
-    git add "$majorVersion/*"
+    if [ -n "${DOC_SUB_FOLDER}" ]; then
+      mkdir -p "$VERSION/$DOC_SUB_FOLDER"
+      cp -r "../$FOLDER/." "./$VERSION/$DOC_SUB_FOLDER"
+      git add "$VERSION/$DOC_SUB_FOLDER/*"
+    else
+      mkdir -p "$VERSION"
+      cp -r "../$FOLDER/." "./$VERSION/"
+      git add "$VERSION/*"
+    fi
+
+    if [ -n "${DOC_SUB_FOLDER}" ]; then
+      mkdir -p "$majorVersion/$DOC_SUB_FOLDER"
+      cp -r "../$FOLDER/." "./$majorVersion/$DOC_SUB_FOLDER"
+      git add "$majorVersion/$DOC_SUB_FOLDER/*"
+    else
+      mkdir -p "$majorVersion"
+      cp -r "../$FOLDER/." "./$majorVersion/"
+      git add "$majorVersion/*"
+    fi
 fi
 
 
 git commit -m "Deploying to ${BRANCH} - $(date +"%T")" --quiet && \
 git push "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$TARGET_REPOSITORY.git" gh-pages || true && \
-echo "Deployment succesful!"
+echo "Deployment successful!"
