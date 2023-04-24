@@ -44,10 +44,6 @@ then
   TARGET_REPOSITORY="${GITHUB_REPOSITORY}"
 fi
 
-# Installs Git.
-apt-get update && \
-apt-get install -y git && \
-
 # Directs the action to the the Github workspace.
 cd $GITHUB_WORKSPACE && \
 
