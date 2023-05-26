@@ -52,6 +52,9 @@ git init && \
 git config --global user.email "${COMMIT_EMAIL}" && \
 git config --global user.name "${COMMIT_NAME}" && \
 
+git config --global http.version HTTP/1.1
+git config --global http.postBuffer 157286400
+
 ## Initializes the repository path using the access token.
 REPOSITORY_PATH="https://${GH_TOKEN}@github.com/${TARGET_REPOSITORY}.git" && \
 
