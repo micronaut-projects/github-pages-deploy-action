@@ -1,4 +1,4 @@
-FROM cgr.dev/chainguard/wolfi-base:latest
+FROM cgr.dev/chainguard/wolfi-base@sha256:b78bb982194828b6c9c214230bf34d51944e2102ea8468f01ac21e5f99328efd
 
 LABEL "com.github.actions.name"="Deploy to GitHub Pages"
 LABEL "com.github.actions.description"="This action will handle the building and deploying process of your project to GitHub Pages."
