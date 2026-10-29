@@ -117,8 +117,8 @@ else
       fi
     fi   
 
-    majorVersion=${VERSION:0:4}
-    majorVersion="${majorVersion}x"
+    # The release line alias: 5.2.17 -> 5.2.x, 4.10.33 -> 4.10.x.
+    majorVersion="$(echo "$VERSION" | cut -d. -f1,2).x"
 
     if [ -n "${DOC_SUB_FOLDER}" ]; then
       mkdir -p "$VERSION/$DOC_SUB_FOLDER"
